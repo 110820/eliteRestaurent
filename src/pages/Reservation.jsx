@@ -1,0 +1,150 @@
+import { useState } from "react";
+import table1 from "../assets/images/table1.jpg";
+import table2 from "../assets/images/table2.jpg";
+import table3 from "../assets/images/table3.jpg";
+import table4 from "../assets/images/table4.jpg";
+import table5 from "../assets/images/table5.jpg";
+import table6 from "../assets/images/table6.jpg";
+import table7 from "../assets/images/table7.jpg";
+import table8 from "../assets/images/table8.jpg";
+import table9 from "../assets/images/table9.jpg";
+
+
+
+
+const Reservation = () => {
+  const [openForm, setOpenForm] = useState(false);
+
+  return (
+    <div className="bg-neutral-950 text-gray-300 pt-28 px-6 pb-16">
+
+        
+
+      {/* Heading */}
+      <div className="text-center mb-14">
+        <h1 className="text-4xl md:text-5xl font-bold text-white">
+          Reserve a Table
+        </h1>
+
+        <p className="mt-4 text-gray-400 max-w-xl mx-auto">
+          Book your cozy spot and enjoy great drinks & music 🍸
+        </p>
+      </div>
+
+      {/* Table Cards */}
+      <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-10">
+
+        {[ 
+          { img: table1, title: "Table 1" },
+          { img: table2, title: "Table 2" },
+          { img: table3, title: "Table 3" },
+          { img: table4, title: "Table 4" },
+          { img: table5, title: "Table 5" },
+          { img: table6, title: "Table 6" },
+          { img: table7, title: "Table 7" },
+          { img: table8, title: "Table 8" },
+          { img: table9, title: "Table 9" },
+        ].map((table, index) => (
+
+          <div
+            key={index}
+            className="bg-black rounded-xl overflow-hidden shadow-lg border border-gray-800 hover:scale-105 transition duration-300"
+          >
+            <img
+              src={table.img}
+              alt={table.title}
+              className="w-full h-64 object-cover"
+            />
+
+            <div className="p-6 text-center">
+              <h3 className="text-xl text-white mb-4">
+                {table.title}
+              </h3>
+
+              <button
+                onClick={() => setOpenForm(true)}
+                className="bg-amber-500 text-black px-6 py-2 rounded-full hover:bg-amber-400 transition"
+              >
+                Book Now
+              </button>
+            </div>
+          </div>
+
+        ))}
+
+      </div>
+
+      {/* Booking Form Modal */}
+      {openForm && (
+        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
+
+          <div className="bg-neutral-950 p-8 rounded-lg max-w-xl w-full relative border border-gray-700">
+
+            {/* Close Button */}
+            <button
+              onClick={() => setOpenForm(false)}
+              className="absolute top-3 right-4 text-white text-xl"
+            >
+              ✖
+            </button>
+
+            {/* Booking Form (UNCHANGED) */}
+            <form className="space-y-6">
+
+              <input
+                type="text"
+                placeholder="Full Name"
+                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none transition"
+              />
+
+              <input
+                type="email"
+                placeholder="Email Address"
+                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none transition"
+              />
+
+              <select
+                className="w-full p-3 bg-transparent border border-gray-100 rounded focus:border-amber-400 outline-none"
+              >
+                <option>Select Guests</option>
+                <option>1 Person</option>
+                <option>2 People</option>
+                <option>3 People</option>
+                <option>4 People</option>
+                <option>5+ People</option>
+              </select>
+
+              <input
+                type="date"
+                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none"
+              />
+
+               <input
+                type="time"
+                className="w-full p-3 bg-transparent border border-white-600 rounded focus:border-amber-400 outline-none"
+              />
+
+              <textarea
+                placeholder="Special Request (Optional)"
+                rows="3"
+                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none"
+              ></textarea>
+
+              <button
+                type="submit"
+                className="w-full bg-amber-500 text-black py-3 font-semibold rounded hover:bg-amber-400 transition"
+              >
+                Book Table
+              </button>
+
+            </form>
+
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+};
+
+export default Reservation;
