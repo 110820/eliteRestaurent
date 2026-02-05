@@ -61,9 +61,7 @@ const About = () => {
           </p>
 
           {/* CTA Button */}
-          <button className="mt-4 px-6 py-3 bg-yellow-500 text-black font-semibold rounded-lg hover:bg-yellow-400 transition">
-            Explore Menu
-          </button>
+          
         </div>
 
       </section>

@@ -49,10 +49,7 @@ const Hero = () => {
               Experience premium ambiance, crafted cocktails, and unforgettable nights.
             </p>
 
-            <button className="bg-orange-600 hover:bg-orange-500 transition px-6 py-3 rounded text-sm md:text-base font-semibold">
-              LEARN MORE
-            </button>
-
+            
           </div>
 
         </div>

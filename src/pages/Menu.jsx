@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { placeOrder } from "../utils/api";
+
 
 // ---------------- Alcoholic Drinks ----------------
 
@@ -65,21 +67,50 @@ const OrderModal = ({ item, closeModal }) => {
     phone: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(`Order booked for ${item.name}`);
-    closeModal();
-  };
+    setLoading(true);
+    setSuccess("");
+    setError("");
 
+    // Payload (matches backend expectations)
+    const payload = {
+      name: formData.name,
+      tableNo: formData.table,
+      itemName: item.name,
+      quantity: Number(formData.quantity),
+      phoneNumber: formData.phone,
+    };
+
+    console.log("Order Payload:", payload);
+
+    try {
+      await placeOrder(payload);
+      setSuccess("Order placed successfully 🍽️");
+
+      setTimeout(() => {
+        closeModal();
+      }, 1200);
+    } catch (err) {
+      console.error(err.response?.data);
+      setError(err.response?.data?.message || "Failed to place order");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
+     
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-4">
       <div className="bg-neutral-200 w-full max-w-md rounded-2xl p-6 relative">
 
-        {/* Close Button */}
         <button
           onClick={closeModal}
           className="absolute top-3 right-4 text-2xl font-bold text-gray-700 hover:text-black"
@@ -87,7 +118,7 @@ const OrderModal = ({ item, closeModal }) => {
           ×
         </button>
 
-        <h2 className="text-2xl font-semibold text-center  text-yellow-500 mb-6">
+        <h2 className="text-2xl font-semibold text-center text-yellow-500 mb-6">
           Book Your Order
         </h2>
 
@@ -97,7 +128,7 @@ const OrderModal = ({ item, closeModal }) => {
             type="text"
             name="name"
             placeholder="Your Name"
-           className="w-full p-3 rounded-lg border text-black placeholder:text-gray-500"
+            className="w-full p-3 rounded-lg border text-black"
             onChange={handleChange}
             required
           />
@@ -106,7 +137,7 @@ const OrderModal = ({ item, closeModal }) => {
             type="text"
             name="table"
             placeholder="Table No"
-            className="w-full p-3 rounded-lg border text-black placeholder:text-gray-500"
+            className="w-full p-3 rounded-lg border text-black"
             onChange={handleChange}
             required
           />
@@ -115,14 +146,15 @@ const OrderModal = ({ item, closeModal }) => {
             type="text"
             value={item.name}
             readOnly
-            className="w-full p-3 rounded-lg border text-black placeholder:text-gray-500"
+            className="w-full p-3 rounded-lg border text-black bg-gray-100"
           />
 
           <input
             type="number"
             name="quantity"
             placeholder="Quantity"
-            className="w-full p-3 rounded-lg border text-black placeholder:text-gray-500"
+            min="1"
+            className="w-full p-3 rounded-lg border text-black"
             onChange={handleChange}
             required
           />
@@ -131,21 +163,26 @@ const OrderModal = ({ item, closeModal }) => {
             type="tel"
             name="phone"
             placeholder="Phone Number"
-           className="w-full p-3 rounded-lg border text-black placeholder:text-gray-500"
+            className="w-full p-3 rounded-lg border text-black"
             onChange={handleChange}
             required
           />
 
+          {success && <p className="text-green-600 text-sm">{success}</p>}
+          {error && <p className="text-red-600 text-sm">{error}</p>}
+
           <button
             type="submit"
-            className="w-full bg-neutral-800 text-white py-3 rounded-full hover:bg-black transition"
+            disabled={loading}
+            className="w-full bg-neutral-800 text-white py-3 rounded-full hover:bg-black transition disabled:opacity-50"
           >
-            Book Order
+            {loading ? "Placing Order..." : "Book Order"}
           </button>
         </form>
       </div>
     </div>
   );
+  
 };
 
 // ---------------- Menu Section ----------------

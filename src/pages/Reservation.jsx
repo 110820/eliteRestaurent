@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { bookTable } from "../utils/api";
+
 import table1 from "../assets/images/table1.jpg";
 import table2 from "../assets/images/table2.jpg";
 import table3 from "../assets/images/table3.jpg";
@@ -9,23 +11,95 @@ import table7 from "../assets/images/table7.jpg";
 import table8 from "../assets/images/table8.jpg";
 import table9 from "../assets/images/table9.jpg";
 
-
-
-
 const Reservation = () => {
   const [openForm, setOpenForm] = useState(false);
+  const [selectedTable, setSelectedTable] = useState("");
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    guests: "",
+    date: "",
+    time: "",
+    specialRequest: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    if (e.target.name === 'guests') {
+      // Extract the number from options like "2 People" or "5+ People"
+      const value = e.target.value;
+      let guestsNumber;
+      
+      if (value === "5+ People") {
+        guestsNumber = 5;
+      } else {
+        // Extract the first number from the string
+        guestsNumber = parseInt(value.match(/\d+/)[0]);
+      }
+      
+      setFormData({
+        ...formData,
+        [e.target.name]: guestsNumber,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value,
+      });
+    }
+  };
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setSuccess("");
+  setError("");
+
+  const payload = {
+    fullName: formData.fullName,
+    email: formData.email,
+    guests: formData.guests,
+    date: formData.date,
+    time: formData.time,
+    specialRequest: formData.specialRequest,
+  };
+
+  console.log("Sending booking:", payload);
+
+  try {
+    await bookTable(payload);
+    setSuccess("Table booked successfully 🎉");
+
+    setFormData({
+      fullName: "",
+      email: "",
+      guests: "",
+      date: "",
+      time: "",
+      specialRequest: "",
+    });
+
+    setTimeout(() => setOpenForm(false), 1500);
+  } catch (err) {
+    console.error("Booking error:", err.response?.data);
+    setError(err.response?.data?.message || "Invalid booking data");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="bg-neutral-950 text-gray-300 pt-28 px-6 pb-16">
-
-        
 
       {/* Heading */}
       <div className="text-center mb-14">
         <h1 className="text-4xl md:text-5xl font-bold text-white">
           Reserve a Table
         </h1>
-
         <p className="mt-4 text-gray-400 max-w-xl mx-auto">
           Book your cozy spot and enjoy great drinks & music 🍸
         </p>
@@ -33,8 +107,7 @@ const Reservation = () => {
 
       {/* Table Cards */}
       <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-10">
-
-        {[ 
+        {[
           { img: table1, title: "Table 1" },
           { img: table2, title: "Table 2" },
           { img: table3, title: "Table 3" },
@@ -45,7 +118,6 @@ const Reservation = () => {
           { img: table8, title: "Table 8" },
           { img: table9, title: "Table 9" },
         ].map((table, index) => (
-
           <div
             key={index}
             className="bg-black rounded-xl overflow-hidden shadow-lg border border-gray-800 hover:scale-105 transition duration-300"
@@ -62,25 +134,24 @@ const Reservation = () => {
               </h3>
 
               <button
-                onClick={() => setOpenForm(true)}
+                onClick={() => {
+                  setSelectedTable(table.title);
+                  setOpenForm(true);
+                }}
                 className="bg-amber-500 text-black px-6 py-2 rounded-full hover:bg-amber-400 transition"
               >
                 Book Now
               </button>
             </div>
           </div>
-
         ))}
-
       </div>
 
       {/* Booking Form Modal */}
       {openForm && (
         <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
-
           <div className="bg-neutral-950 p-8 rounded-lg max-w-xl w-full relative border border-gray-700">
 
-            {/* Close Button */}
             <button
               onClick={() => setOpenForm(false)}
               className="absolute top-3 right-4 text-white text-xl"
@@ -88,57 +159,86 @@ const Reservation = () => {
               ✖
             </button>
 
-            {/* Booking Form (UNCHANGED) */}
-            <form className="space-y-6">
+            <h2 className="text-white text-xl mb-4">
+              Booking for {selectedTable}
+            </h2>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
 
               <input
                 type="text"
+                name="fullName"
                 placeholder="Full Name"
-                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none transition"
+                value={formData.fullName}
+                onChange={handleChange}
+                required
+                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none"
               />
 
               <input
                 type="email"
+                name="email"
                 placeholder="Email Address"
-                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none transition"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none"
               />
 
               <select
-                className="w-full p-3 bg-transparent border border-gray-100 rounded focus:border-amber-400 outline-none"
+                name="guests"
+                value={formData.guests || ""}
+                onChange={handleChange}
+                required
+                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none"
               >
-                <option>Select Guests</option>
-                <option>1 Person</option>
-                <option>2 People</option>
-                <option>3 People</option>
-                <option>4 People</option>
-                <option>5+ People</option>
+                <option value="">Select Guests</option>
+                <option value="1">1 Person</option>
+                <option value="2">2 People</option>
+                <option value="3">3 People</option>
+                <option value="4">4 People</option>
+                <option value="5">5+ People</option>
               </select>
 
               <input
                 type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                required
                 className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none"
               />
 
-               <input
+              <input
                 type="time"
-                className="w-full p-3 bg-transparent border border-white-600 rounded focus:border-amber-400 outline-none"
+                name="time"
+                value={formData.time}
+                onChange={handleChange}
+                required
+                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none"
               />
 
               <textarea
+                name="specialRequest"
                 placeholder="Special Request (Optional)"
+                value={formData.specialRequest}
+                onChange={handleChange}
                 rows="3"
                 className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none"
-              ></textarea>
+              />
+
+              {success && <p className="text-green-400 text-sm">{success}</p>}
+              {error && <p className="text-red-400 text-sm">{error}</p>}
 
               <button
                 type="submit"
-                className="w-full bg-amber-500 text-black py-3 font-semibold rounded hover:bg-amber-400 transition"
+                disabled={loading}
+                className="w-full bg-amber-500 text-black py-3 font-semibold rounded hover:bg-amber-400 transition disabled:opacity-50"
               >
-                Book Table
+                {loading ? "Booking..." : "Book Table"}
               </button>
 
             </form>
-
           </div>
         </div>
       )}
