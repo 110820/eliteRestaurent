@@ -13,11 +13,36 @@ const Contact = () => {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
+  const validatePhone = (phone) => {
+    // Remove all non-digit characters
+    const cleanPhone = phone.replace(/\D/g, '');
+    
+    // Check if it's exactly 10 digits
+    if (cleanPhone.length !== 10) {
+      return "Phone number must be exactly 10 digits";
+    }
+    
+    // Check if it starts with 6, 7, 8, or 9 (valid Indian mobile numbers)
+    if (!/^[6-9]/.test(cleanPhone)) {
+      return "Phone number must start with 6, 7, 8, or 9";
+    }
+    
+    return ""; // No error
+  };
+
   const handleChange = (e) => {
+    const { name, value } = e.target;
+    
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+    
+    // Validate phone number in real-time
+    if (name === "phone") {
+      const error = validatePhone(value);
+      setError(error);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -25,6 +50,14 @@ const Contact = () => {
     setLoading(true);
     setSuccess("");
     setError("");
+    
+    // Validate phone before submission
+    const phoneValidationError = validatePhone(formData.phone);
+    if (phoneValidationError) {
+      setError(phoneValidationError);
+      setLoading(false);
+      return;
+    }
 
     try {
       await sendContact(formData);
@@ -88,11 +121,15 @@ const Contact = () => {
           <input
             type="text"
             name="phone"
-            placeholder="Phone No"
+            placeholder="Phone Number (10 digits)"
             value={formData.phone}
             onChange={handleChange}
             required
-            className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none transition"
+            className={`w-full p-3 bg-transparent border rounded focus:outline-none transition ${
+              error && error.includes("Phone") 
+                ? "border-red-500 focus:border-red-500" 
+                : "border-gray-600 focus:border-amber-400"
+            }`}
           />
 
           <input

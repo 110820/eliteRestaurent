@@ -71,8 +71,33 @@ const OrderModal = ({ item, closeModal }) => {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
+  const validatePhone = (phone) => {
+    // Remove all non-digit characters
+    const cleanPhone = phone.replace(/\D/g, '');
+    
+    // Check if it's exactly 10 digits
+    if (cleanPhone.length !== 10) {
+      return "Phone number must be exactly 10 digits";
+    }
+    
+    // Check if it starts with 6, 7, 8, or 9 (valid Indian mobile numbers)
+    if (!/^[6-9]/.test(cleanPhone)) {
+      return "Phone number must start with 6, 7, 8, or 9";
+    }
+    
+    return ""; // No error
+  };
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    setFormData({ ...formData, [name]: value });
+    
+    // Validate phone number in real-time
+    if (name === "phone") {
+      const error = validatePhone(value);
+      setError(error);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -80,6 +105,14 @@ const OrderModal = ({ item, closeModal }) => {
     setLoading(true);
     setSuccess("");
     setError("");
+
+    // Validate phone before submission
+    const phoneValidationError = validatePhone(formData.phone);
+    if (phoneValidationError) {
+      setError(phoneValidationError);
+      setLoading(false);
+      return;
+    }
 
     // Payload (matches backend expectations)
     const payload = {
@@ -95,6 +128,14 @@ const OrderModal = ({ item, closeModal }) => {
     try {
       await placeOrder(payload);
       setSuccess("Order placed successfully 🍽️");
+
+      // Reset form
+      setFormData({
+        name: "",
+        table: "",
+        quantity: "",
+        phone: "",
+      });
 
       setTimeout(() => {
         closeModal();
@@ -162,10 +203,13 @@ const OrderModal = ({ item, closeModal }) => {
           <input
             type="tel"
             name="phone"
-            placeholder="Phone Number"
-            className="w-full p-3 rounded-lg border text-black"
+            placeholder="Phone Number (10 digits)"
+            value={formData.phone}
             onChange={handleChange}
             required
+            className={`w-full p-3 rounded-lg border text-black ${
+              error && error.includes("Phone") ? "border-red-500" : "border-gray-300"
+            }`}
           />
 
           {success && <p className="text-green-600 text-sm">{success}</p>}
