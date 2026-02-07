@@ -6,31 +6,27 @@ import img4 from "../assets/images/rice.jpg";
 const newsData = [
   {
     id: 1,
-    date: "11",
     image: img1,
-    title: "Lorem ipsum dummy text",
-    desc: "Industry standard dummy text.",
+    title: "Tandoori",
+    
   },
   {
     id: 2,
-    date: "12",
     image: img2,
-    title: "Latest industry updates",
-    desc: "Trending market insights.",
+    title: "Chiken LolliPop ",
+    
   },
   {
     id: 3,
-    date: "13",
     image: img3,
-    title: "New product launch",
-    desc: "Discover our new arrivals.",
+    title: "ChiliPaneer",
+   
   },
   {
     id: 4,
-    date: "15",
     image: img4,
-    title: "Business growth news",
-    desc: "Company expansion details.",
+    title: "Biryani",
+   
   },
 ];
 
@@ -55,7 +51,7 @@ const LatestNews = () => {
             />
 
             {/* Content */}
-            <div className="p-3 sm:p-4">
+            <div className="p-3 sm:p-4 text-center">
               <span className="text-orange-500 text-xs sm:text-sm">
                 {item.date}
               </span>

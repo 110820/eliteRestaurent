@@ -42,7 +42,7 @@ const Hero = () => {
           <div className="max-w-2xl text-center sm:text-left text-white mx-auto sm:mx-0">
 
             <h2 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight">
-              SIXTH SENSE BAR
+              PATIL RESTRO AND BAR
             </h2>
 
             <p className="text-gray-300 mb-6 sm:mb-8 text-base sm:text-lg md:text-xl max-w-md sm:max-w-lg mx-auto sm:mx-0">
