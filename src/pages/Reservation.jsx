@@ -30,83 +30,60 @@ const Reservation = () => {
 
   const handleChange = (e) => {
     if (e.target.name === 'guests') {
-      // Extract the number from options like "2 People" or "5+ People"
       const value = e.target.value;
       let guestsNumber;
-      
       if (value === "5+ People") {
         guestsNumber = 5;
       } else {
-        // Extract the first number from the string
         guestsNumber = parseInt(value.match(/\d+/)[0]);
       }
-      
-      setFormData({
-        ...formData,
-        [e.target.name]: guestsNumber,
-      });
+      setFormData({ ...formData, [e.target.name]: guestsNumber });
     } else {
-      setFormData({
-        ...formData,
-        [e.target.name]: e.target.value,
-      });
+      setFormData({ ...formData, [e.target.name]: e.target.value });
     }
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setSuccess("");
-  setError("");
+    e.preventDefault();
+    setLoading(true);
+    setSuccess("");
+    setError("");
 
-  const payload = {
-    fullName: formData.fullName,
-    email: formData.email,
-    guests: formData.guests,
-    date: formData.date,
-    time: formData.time,
-    specialRequest: formData.specialRequest,
+    const payload = {
+      fullName: formData.fullName,
+      email: formData.email,
+      guests: formData.guests,
+      date: formData.date,
+      time: formData.time,
+      specialRequest: formData.specialRequest,
+    };
+
+    try {
+      await bookTable(payload);
+      setSuccess("Table booked successfully 🎉");
+      setFormData({ fullName: "", email: "", guests: "", date: "", time: "", specialRequest: "" });
+      setTimeout(() => setOpenForm(false), 1500);
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid booking data");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  console.log("Sending booking:", payload);
-
-  try {
-    await bookTable(payload);
-    setSuccess("Table booked successfully 🎉");
-
-    setFormData({
-      fullName: "",
-      email: "",
-      guests: "",
-      date: "",
-      time: "",
-      specialRequest: "",
-    });
-
-    setTimeout(() => setOpenForm(false), 1500);
-  } catch (err) {
-    console.error("Booking error:", err.response?.data);
-    setError(err.response?.data?.message || "Invalid booking data");
-  } finally {
-    setLoading(false);
-  }
-};
-
   return (
-    <div className="bg-neutral-950 text-gray-300 pt-28 px-6 pb-16">
-
+    <div className="bg-neutral-950 text-gray-300 pt-24 sm:pt-28 px-4 sm:px-6 pb-12 sm:pb-16">
       {/* Heading */}
-      <div className="text-center mb-14">
-        <h1 className="text-4xl md:text-5xl font-bold text-white">
+      <div className="text-center mb-10 sm:mb-14">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white">
           Reserve a Table
         </h1>
-        <p className="mt-4 text-gray-400 max-w-xl mx-auto">
+        <p className="mt-3 sm:mt-4 text-gray-400 text-sm sm:text-base max-w-xl mx-auto">
           Book your cozy spot and enjoy great drinks & music 🍸
         </p>
       </div>
 
       {/* Table Cards */}
-      <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-10">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
         {[
           { img: table1, title: "Table 1" },
           { img: table2, title: "Table 2" },
@@ -125,11 +102,11 @@ const Reservation = () => {
             <img
               src={table.img}
               alt={table.title}
-              className="w-full h-64 object-cover"
+              className="w-full h-48 sm:h-56 md:h-64 object-cover"
             />
 
-            <div className="p-6 text-center">
-              <h3 className="text-xl text-white mb-4">
+            <div className="p-4 sm:p-6 text-center">
+              <h3 className="text-lg sm:text-xl text-white mb-3 sm:mb-4">
                 {table.title}
               </h3>
 
@@ -138,7 +115,7 @@ const Reservation = () => {
                   setSelectedTable(table.title);
                   setOpenForm(true);
                 }}
-                className="bg-amber-500 text-black px-6 py-2 rounded-full hover:bg-amber-400 transition"
+                className="bg-amber-500 text-black px-4 sm:px-6 py-2 rounded-full hover:bg-amber-400 transition text-sm sm:text-base"
               >
                 Book Now
               </button>
@@ -149,22 +126,20 @@ const Reservation = () => {
 
       {/* Booking Form Modal */}
       {openForm && (
-        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
-          <div className="bg-neutral-950 p-8 rounded-lg max-w-xl w-full relative border border-gray-700">
-
+        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50 p-4">
+          <div className="bg-neutral-950 p-4 sm:p-6 md:p-8 rounded-lg max-w-xl w-full relative border border-gray-700">
             <button
               onClick={() => setOpenForm(false)}
-              className="absolute top-3 right-4 text-white text-xl"
+              className="absolute top-2 right-3 sm:top-3 sm:right-4 text-white text-lg sm:text-xl"
             >
               ✖
             </button>
 
-            <h2 className="text-white text-xl mb-4">
+            <h2 className="text-white text-lg sm:text-xl mb-3 sm:mb-4">
               Booking for {selectedTable}
             </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 md:space-y-5">
               <input
                 type="text"
                 name="fullName"
@@ -172,7 +147,7 @@ const Reservation = () => {
                 value={formData.fullName}
                 onChange={handleChange}
                 required
-                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none"
+                className="w-full p-2 sm:p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none text-sm sm:text-base"
               />
 
               <input
@@ -182,7 +157,7 @@ const Reservation = () => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none"
+                className="w-full p-2 sm:p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none text-sm sm:text-base"
               />
 
               <select
@@ -190,7 +165,7 @@ const Reservation = () => {
                 value={formData.guests || ""}
                 onChange={handleChange}
                 required
-                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none"
+                className="w-full p-2 sm:p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none text-sm sm:text-base"
               >
                 <option value="">Select Guests</option>
                 <option value="1">1 Person</option>
@@ -206,7 +181,7 @@ const Reservation = () => {
                 value={formData.date}
                 onChange={handleChange}
                 required
-                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none"
+                className="w-full p-2 sm:p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none text-sm sm:text-base"
               />
 
               <input
@@ -215,7 +190,7 @@ const Reservation = () => {
                 value={formData.time}
                 onChange={handleChange}
                 required
-                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none"
+                className="w-full p-2 sm:p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none text-sm sm:text-base"
               />
 
               <textarea
@@ -224,25 +199,23 @@ const Reservation = () => {
                 value={formData.specialRequest}
                 onChange={handleChange}
                 rows="3"
-                className="w-full p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none"
+                className="w-full p-2 sm:p-3 bg-transparent border border-gray-600 rounded focus:border-amber-400 outline-none text-sm sm:text-base"
               />
 
-              {success && <p className="text-green-400 text-sm">{success}</p>}
-              {error && <p className="text-red-400 text-sm">{error}</p>}
+              {success && <p className="text-green-400 text-xs sm:text-sm">{success}</p>}
+              {error && <p className="text-red-400 text-xs sm:text-sm">{error}</p>}
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-amber-500 text-black py-3 font-semibold rounded hover:bg-amber-400 transition disabled:opacity-50"
+                className="w-full bg-amber-500 text-black py-2 sm:py-3 font-semibold rounded hover:bg-amber-400 transition disabled:opacity-50 text-sm sm:text-base"
               >
                 {loading ? "Booking..." : "Book Table"}
               </button>
-
             </form>
           </div>
         </div>
       )}
-
     </div>
   );
 };
